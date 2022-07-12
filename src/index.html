@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE Test</title>
+</head>
+<body>
+    <h1>SSE Test</h1>
+    Enter name: <input id="name-input" /> <button id="start-button">Start!</button>
+    <table id="items-table">
+        <tr>
+            <th>Event data</th>
+            <th>Time</th>
+        </tr>
+    </table>
+
+    <script>
+        const appendItem = (html) => {
+            const itemsContainer = document.getElementById('items-table');
+            const newItem = document.createElement('tr');
+            newItem.innerHTML = html;
+            itemsContainer.appendChild(newItem);
+        };
+
+        const setupSseConnection = (name) => {
+            const eventSource = new EventSource(`http://localhost:4000/events/${name}`);
+
+            eventSource.onmessage = (event) => {
+                const parsedEvent = JSON.parse(event.data);
+                const { time, type, data } = parsedEvent;
+                if(type === 'end'){
+                    eventSource.close();
+                    appendItem(`<td>Finished</td><td>${time}</td>`);
+                    document.getElementById('start').disabled = false;
+                    return;
+                }
+                appendItem(`<td>${data.greeting}</td><td>${time}</td>`);
+            };
+
+            eventSource.onerror = (error) => {
+                appendItem(`<td>An error ocurred: ${error}</td><td>${time}</td>`);
+            }
+        };
+
+        document.getElementById('start-button').addEventListener('click', () => {
+            document.getElementById('start-button').disabled = true;
+            setupSseConnection(document.getElementById('name-input').value);
+        });
+    </script>
+</body>
+</html>

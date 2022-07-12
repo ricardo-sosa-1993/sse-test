@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "outDir": "./build",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false
+  }
+}
